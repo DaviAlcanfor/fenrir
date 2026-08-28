@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="260" viewBox="0 0 1000 260" role="img" aria-label="fenrir — multi-agent, human-in-the-loop bug bounty assistant">
+  <rect width="1000" height="260" fill="#0b0d10"/>
+  <rect x="0" y="0" width="1000" height="4" fill="#e5484d"/>
+
+  <!-- geometric wolf head -->
+  <g transform="translate(70 58)" fill="none" stroke="#e5484d" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M12 8 L44 40 L44 96 L72 144 L100 96 L100 40 L132 8 L120 60 L138 74 L100 110 L72 150 L44 110 L6 74 L24 60 Z"/>
+    <path d="M60 96 L72 112 L84 96" stroke-width="3"/>
+    <path d="M40 66 h14 M90 66 h14" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <text x="210" y="132" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
+        font-size="104" font-weight="700" letter-spacing="8" fill="#f4f6f8">fenrir</text>
+  <text x="214" y="176" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
+        font-size="21" letter-spacing="3" fill="#8a94a3">multi-agent · human-in-the-loop · bug bounty</text>
+  <text x="214" y="208" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
+        font-size="16" letter-spacing="2" fill="#5c6470">deepagents · anthropic skills · hexstrike over MCP</text>
+</svg>

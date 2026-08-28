@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="fenrir" width="100%">
+</p>
+
 # fenrir
 
 A multi-agent, human-in-the-loop assistant for bug bounty / web pentesting. An orchestrator scopes the engagement and delegates to recon, web, exploit, and triage specialists, each following vendored methodology playbooks and driving 150+ security tools over MCP.
