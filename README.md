@@ -30,11 +30,11 @@ The orchestrator never touches a target itself: it reads `scope.md`, plans the e
 
 | Agent | Responsibility | Default model |
 |-------|----------------|---------------|
-| `orchestrator` | Scope enforcement, planning, delegation. Runs no offensive tools. | `gemini-2.0-flash` |
-| `recon` | Subdomain, DNS, port, technology, and content discovery; takeover checks. | `llama-3.3-70b` |
-| `web` | Hands-on testing of one surface against OWASP WSTG methodology. | `gemini-2.0-flash` |
-| `exploit` | Minimal proof-of-concept for a single confirmed finding. Always gated. | `deepseek-r1` |
-| `triage` | Deduplication, CVSS scoring, report writing. | `llama-3.3-70b` |
+| `orchestrator` | Scope enforcement, planning, delegation. Runs no offensive tools. | `gemini-3.6-flash` |
+| `recon` | Subdomain, DNS, port, technology, and content discovery; takeover checks. | `gpt-oss-120b` |
+| `web` | Hands-on testing of one surface against OWASP WSTG methodology. | `gemini-3.6-flash` |
+| `exploit` | Minimal proof-of-concept for a single confirmed finding. Always gated. | `nemotron-super` |
+| `triage` | Deduplication, CVSS scoring, report writing. | `gpt-oss-120b` |
 
 Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenrir/config.py).
 

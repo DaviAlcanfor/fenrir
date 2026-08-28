@@ -18,15 +18,15 @@ class Agent(StrEnum):
 
 
 class Model(StrEnum):
-    GEMINI_FLASH = "google_genai:gemini-2.0-flash"
-    LLAMA_70B = "groq:llama-3.3-70b-versatile"
-    DEEPSEEK_R1 = "openrouter:deepseek/deepseek-r1:free"
+    GEMINI_FLASH = "google_genai:gemini-3.6-flash"
+    GPT_OSS_120B = "groq:openai/gpt-oss-120b"
+    NEMOTRON_SUPER = "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 
 
 MODELS: Mapping[Agent, Model] = {
     Agent.ORCHESTRATOR: Model.GEMINI_FLASH,
-    Agent.RECON: Model.LLAMA_70B,
+    Agent.RECON: Model.GPT_OSS_120B,
     Agent.WEB: Model.GEMINI_FLASH,
-    Agent.EXPLOIT: Model.DEEPSEEK_R1,
-    Agent.TRIAGE: Model.LLAMA_70B,
+    Agent.EXPLOIT: Model.NEMOTRON_SUPER,
+    Agent.TRIAGE: Model.GPT_OSS_120B,
 }

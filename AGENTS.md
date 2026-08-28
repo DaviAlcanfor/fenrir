@@ -52,9 +52,9 @@ per-thread state. SSE events: `thread`, `message`, `interrupt`, `error`, `done`.
 
 Model routing (`MODELS` in `config.py` — edit the table to change it):
 
-- orchestrator, web → `google_genai:gemini-2.0-flash`
-- recon, triage → `groq:llama-3.3-70b-versatile`
-- exploit → `openrouter:deepseek/deepseek-r1:free`
+- orchestrator, web → `google_genai:gemini-3.6-flash`
+- recon, triage → `groq:openai/gpt-oss-120b`
+- exploit → `openrouter:nvidia/nemotron-3-super-120b-a12b:free`
 
 ## Rules for agents working in this repo
 
