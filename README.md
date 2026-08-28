@@ -6,12 +6,19 @@
   <img src="https://img.shields.io/badge/python-3.13%2B-blue" alt="Python 3.13+">
   <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT License">
   <img src="https://img.shields.io/badge/LLMs-free--tier-orange" alt="Free-tier LLMs">
-  <img src="https://img.shields.io/badge/mode-human--in--the--loop-red" alt="Human in the loop">
+  <img src="https://img.shields.io/badge/mode-human--in--the--loop-8b5cf6" alt="Human in the loop">
 </p>
 
-# fenrir
+<h1 align="center">fenrir</h1>
 
-A multi-agent assistant for bug bounty and web application penetration testing. An orchestrator scopes the engagement and delegates to four specialists — recon, web, exploit, and triage — each backed by vendored methodology playbooks and a shared belt of 150+ security tools exposed over MCP.
+<p align="center">
+  <b>A multi-agent, human-in-the-loop assistant for bug bounty and web application penetration testing.</b>
+</p>
+
+<p align="center">
+  An orchestrator scopes the engagement and delegates to four specialists — recon, web, exploit, and triage —<br>
+  each backed by vendored methodology playbooks and a shared belt of 150+ security tools exposed over MCP.
+</p>
 
 > **Authorized use only.** fenrir refuses any target not listed in `scope.md`, and every tool call that sends traffic pauses for operator approval. It is not autonomous. Use it only within a bug bounty program's stated scope or an engagement you hold written authorization for. Unauthorized scanning or exploitation may be illegal in your jurisdiction.
 

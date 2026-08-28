@@ -1,18 +1,42 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="260" viewBox="0 0 1000 260" role="img" aria-label="fenrir — multi-agent, human-in-the-loop bug bounty assistant">
-  <rect width="1000" height="260" fill="#0b0d10"/>
-  <rect x="0" y="0" width="1000" height="4" fill="#e5484d"/>
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0c0a14"/>
+      <stop offset="1" stop-color="#0b0d10"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#7c3aed" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1000" height="260" fill="url(#bg)"/>
+  <rect x="0" y="0" width="1000" height="4" fill="url(#brand)"/>
+
+  <!-- soft glow behind the mark -->
+  <circle cx="148" cy="132" r="124" fill="url(#glow)"/>
 
   <!-- geometric wolf head -->
-  <g transform="translate(70 58)" fill="none" stroke="#e5484d" stroke-width="3.5" stroke-linejoin="round">
-    <path d="M12 8 L44 40 L44 96 L72 144 L100 96 L100 40 L132 8 L120 60 L138 74 L100 110 L72 150 L44 110 L6 74 L24 60 Z"/>
-    <path d="M60 96 L72 112 L84 96" stroke-width="3"/>
-    <path d="M40 66 h14 M90 66 h14" stroke-width="6" stroke-linecap="round"/>
+  <g transform="translate(74 52)">
+    <path d="M8 6 L46 44 L72 28 L98 44 L136 6 L112 58 L120 74 L100 112 L72 158 L44 112 L24 74 L32 58 Z"
+          fill="url(#brand)" fill-opacity="0.08"
+          stroke="url(#brand)" stroke-width="3.5" stroke-linejoin="round"/>
+    <!-- eyes -->
+    <path d="M40 68 L55 75 L46 82 M104 68 L89 75 L98 82"
+          fill="none" stroke="#c4b5fd" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- muzzle -->
+    <path d="M72 92 L72 140 M60 120 L72 134 L84 120"
+          fill="none" stroke="url(#brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <text x="210" y="132" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
         font-size="104" font-weight="700" letter-spacing="8" fill="#f4f6f8">fenrir</text>
   <text x="214" y="176" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
-        font-size="21" letter-spacing="3" fill="#8a94a3">multi-agent · human-in-the-loop · bug bounty</text>
+        font-size="21" letter-spacing="3" fill="#a78bfa">multi-agent · human-in-the-loop · bug bounty</text>
   <text x="214" y="208" font-family="'DejaVu Sans Mono','SFMono-Regular',Menlo,Consolas,monospace"
-        font-size="16" letter-spacing="2" fill="#5c6470">deepagents · anthropic skills · hexstrike over MCP</text>
+        font-size="16" letter-spacing="2" fill="#6b7280">deepagents · anthropic skills · hexstrike over MCP</text>
 </svg>
