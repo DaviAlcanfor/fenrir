@@ -1,0 +1,34 @@
+[project]
+name = "fenrir"
+version = "0.1.0"
+description = "Multi-agent, human-in-the-loop bug bounty / web pentest assistant"
+readme = "README.md"
+authors = [
+    { name = "DaviAlcanfor", email = "alcanfordavi@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "deepagents>=0.7.10",
+    "langchain-mcp-adapters>=0.1.0",
+    "langchain-google-genai>=2.0.0",
+    "langchain-groq>=0.2.0",
+    "langchain-openrouter>=0.1.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "jsonpointer>=3.1.1",
+    "pyfiglet>=1.0.4",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
+]
+
+[project.scripts]
+fenrir = "fenrir.cli:main"
+fenrir-api = "fenrir.server:run"
+
+[build-system]
+requires = ["uv_build>=0.12.6,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+# Repo lives under OneDrive; hardlinking from the uv cache fails (os error 396).
+link-mode = "copy"
