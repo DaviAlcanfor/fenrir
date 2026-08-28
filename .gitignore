@@ -4,3 +4,4 @@ findings/
 __pycache__/
 *.pyc
 .venv/
+fenrir.db

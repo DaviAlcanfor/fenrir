@@ -50,8 +50,11 @@ uv run fenrir-api               # http://localhost:8000
 | `GET /health` | — | agent readiness |
 | `POST /chat` | `{message, thread_id?}` | start / continue a run (SSE) |
 | `POST /threads/{id}/resume` | `{decisions}` | answer a gated tool call (SSE) |
+| `GET /threads` | — | list past conversations |
+| `GET /threads/{id}` | — | replay a conversation's messages |
 
-SSE events: `thread`, `message`, `interrupt`, `error`, `done`.
+SSE events: `thread`, `message`, `interrupt`, `error`, `done`. Conversations
+persist in `fenrir.db` (SQLite) across restarts.
 
 ### Web UI
 ```bash
