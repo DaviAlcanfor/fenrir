@@ -1,0 +1,28 @@
+# Engagement scope
+
+> Copy to `scope.md`. fenrir refuses to touch anything not described here.
+
+## Program
+- Name / platform:
+- Authorization reference (URL or ticket):
+
+## In scope
+- example.com and *.example.com
+- 203.0.113.0/24
+- Paths: /api/*, /app/*
+
+## Out of scope
+- blog.example.com (third-party hosted)
+- Any subdomain resolving to a shared CDN
+- Physical, social engineering, DoS
+
+## Rules of engagement
+- Max request rate: 5 req/s
+- Testing window: 2026-08-28 .. 2026-09-11, 09:00–18:00 BRT
+- Program rules: no automated scanners without approval, no fuzzing auth endpoints,
+  report critical findings within 24h
+
+## Test accounts
+- user A: ...
+- user B: ...
+- admin: ...
