@@ -19,11 +19,11 @@ npm run dev                       # http://localhost:3000
 
 ## Files
 
-- `lib/api.ts` — `sendMessage()` / `resume()`; parses the SSE frames
-  (`thread` / `message` / `interrupt` / `error` / `done`).
-- `app/page.tsx` — chat log + composer, GSAP entrance on the masthead and on each
-  new message.
+- `lib/api.ts` — `sendMessage()` / `resume()` (SSE), `listThreads()` / `getThread()` (JSON).
+- `app/page.tsx` — sidebar (conversation list + "new conversation"), chat log,
+  composer. GSAP entrance on the masthead, sidebar items, and each new message.
 - `components/ApprovalPanel.tsx` — approve/reject the gated tool calls fenrir
   pauses on; posts back to `/threads/{id}/resume`.
 
-Not included: auth, thread history, markdown rendering, token-level streaming.
+Conversations persist server-side in `fenrir.db`; the sidebar is backed by
+`GET /threads`. Not included: auth, markdown rendering, token-level streaming.

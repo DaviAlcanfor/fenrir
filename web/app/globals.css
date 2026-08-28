@@ -17,10 +17,46 @@ body {
   font: 14px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
+.app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.new-chat { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.thread-list { display: flex; flex-direction: column; gap: 4px; }
+.thread-item {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.thread-item:hover { background: var(--panel); color: var(--text); }
+.thread-item.active { background: var(--panel); color: var(--text); border-left: 2px solid var(--accent); }
+
 main {
+  flex: 1;
+  min-width: 0;
   max-width: 820px;
   margin: 0 auto;
-  padding: 24px 16px 120px;
+  padding: 24px 16px 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -45,13 +81,14 @@ h1 { font-size: 20px; letter-spacing: 0.14em; text-transform: lowercase; margin:
 .msg .tool-call { color: var(--muted); }
 
 .composer {
-  position: fixed;
-  bottom: 0; left: 0; right: 0;
+  position: sticky;
+  bottom: 0;
   border-top: 1px solid var(--border);
   background: var(--bg);
-  padding: 12px 16px;
+  padding: 12px 0;
+  margin-top: auto;
 }
-.composer form { max-width: 820px; margin: 0 auto; display: flex; gap: 8px; }
+.composer form { display: flex; gap: 8px; }
 .composer input {
   flex: 1;
   background: var(--panel);
