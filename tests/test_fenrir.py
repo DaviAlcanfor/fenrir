@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 from fenrir import prompts, subagents as sa  # noqa: E402
 from fenrir.config import MODELS, Agent, Model  # noqa: E402
 from fenrir.subagents import _belt, _gate  # noqa: E402
-from fenrir.tools import _matches, in_scope, load_scope  # noqa: E402
+from fenrir.tools import _matches, in_scope, load_paths, load_scope  # noqa: E402
 
 FAKE = [SimpleNamespace(name=n) for n in ("subfinder_scan", "sqlmap_scan", "nmap_scan", "metasploit_exploit")]
 
@@ -66,6 +66,41 @@ def test_scope_parse_and_classify():
         assert "*.example.com" in allow and "blog.example.com" in deny
         # in_scope() reads the real scope.md, so just exercise the parser+matcher here
         assert _matches("blog.example.com", deny[0])
+    finally:
+        p.unlink()
+
+
+def test_load_paths_extracts_paths_line():
+    p = Path(__file__).parent / "_scope_paths_fixture.md"
+    p.write_text(
+        "# scope\n## In scope\n- *.example.com\n- Paths: /api/*, /app/*\n",
+        encoding="utf-8",
+    )
+    try:
+        assert load_paths(p) == ("/api/*", "/app/*")
+    finally:
+        p.unlink()
+
+
+def test_load_paths_defaults_to_wildcard_when_absent():
+    p = Path(__file__).parent / "_scope_nopaths_fixture.md"
+    p.write_text("# scope\n## In scope\n- *.example.com\n", encoding="utf-8")
+    try:
+        assert load_paths(p) == ("*",)
+    finally:
+        p.unlink()
+
+
+def test_in_scope_tool_respects_path_restriction():
+    p = Path(__file__).parent.parent / "scope.md"
+    assert not p.exists(), "a real scope.md exists — refusing to overwrite it for a test"
+    p.write_text(
+        "# scope\n## In scope\n- *.example.com\n- Paths: /api/*\n",
+        encoding="utf-8",
+    )
+    try:
+        assert "IN SCOPE" in in_scope.invoke({"target": "https://app.example.com/api/users"})
+        assert "OUT OF SCOPE" in in_scope.invoke({"target": "https://app.example.com/admin"})
     finally:
         p.unlink()
 
