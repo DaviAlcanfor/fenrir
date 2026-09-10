@@ -22,18 +22,44 @@ def test_belt_filters_by_agent():
 
 
 def test_gate_wraps_tools_plus_execute():
-    g = _gate(FAKE)
+    g = _gate(Agent.WEB, FAKE)
     assert g["execute"] is True
     assert all(g[t.name] is True for t in FAKE)
 
 
-def test_gate_empty_when_approval_disabled():
-    old = sa.settings.require_approval
-    sa.settings.require_approval = False
+def test_gate_empty_when_agent_approval_disabled():
+    old = sa.settings.approval.require_approval_web
+    sa.settings.approval.require_approval_web = False
     try:
-        assert _gate(FAKE) == {}
+        assert _gate(Agent.WEB, FAKE) == {}
     finally:
-        sa.settings.require_approval = old
+        sa.settings.approval.require_approval_web = old
+
+
+def test_exploit_gate_cannot_be_disabled():
+    old_recon = sa.settings.approval.require_approval_recon
+    old_web = sa.settings.approval.require_approval_web
+    sa.settings.approval.require_approval_recon = False
+    sa.settings.approval.require_approval_web = False
+    try:
+        g = _gate(Agent.EXPLOIT, FAKE)
+        assert g["execute"] is True
+        assert all(g[t.name] is True for t in FAKE)
+    finally:
+        sa.settings.approval.require_approval_recon = old_recon
+        sa.settings.approval.require_approval_web = old_web
+
+
+def test_exploit_gate_ignores_env_override():
+    import os
+
+    os.environ["APPROVAL__REQUIRE_APPROVAL_EXPLOIT"] = "false"
+    try:
+        from fenrir.settings import ApprovalSettings
+
+        assert ApprovalSettings().require_approval_exploit is True
+    finally:
+        del os.environ["APPROVAL__REQUIRE_APPROVAL_EXPLOIT"]
 
 
 def test_models_cover_every_agent():
@@ -44,6 +70,19 @@ def test_models_cover_every_agent():
 def test_prompts_load_every_agent():
     for agent in Agent:
         assert len(prompts.load(agent)) > 200
+
+
+def test_root_shell_requires_approval():
+    from fenrir.agents import ROOT_INTERRUPT_ON
+
+    assert ROOT_INTERRUPT_ON.get("execute") is True
+
+
+def test_general_purpose_subagent_is_locked_down():
+    specs = sa.make_subagents(FAKE)
+    gp = next(s for s in specs if s["name"] == "general-purpose")
+    assert gp["tools"] == []
+    assert gp["interrupt_on"].get("execute") is True
 
 
 def test_scope_matching():
@@ -103,6 +142,18 @@ def test_in_scope_tool_respects_path_restriction():
         assert "OUT OF SCOPE" in in_scope.invoke({"target": "https://app.example.com/admin"})
     finally:
         p.unlink()
+
+
+def test_cli_approval_is_fail_closed():
+    from fenrir.cli import _approved
+
+    assert _approved("y")
+    assert _approved("Y")
+    assert _approved("yes")
+    assert _approved("  yes  ")
+    assert not _approved("")  # empty Enter must NOT approve
+    assert not _approved("n")
+    assert not _approved("sure")
 
 
 if __name__ == "__main__":

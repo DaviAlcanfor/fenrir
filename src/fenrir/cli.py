@@ -14,19 +14,23 @@ RECURSION_LIMIT = 100
 BANNER = pyfiglet.figlet_format("fenrir", font="slant")
 
 
+def _approved(answer: str) -> bool:
+    return answer.strip().lower() in ("y", "yes")
+
+
 def _decide(request: dict) -> list[dict]:
     """Ask the operator to approve/reject each gated action in an interrupt."""
     decisions = []
-    
+
     for action in request["action_requests"]:
         print(f"\n  ⚠  {action['name']}  {action.get('args', {})}")
-    
-        if input("  approve? [Y/n] ").strip().lower() in ("", "y", "yes"):
+
+        if _approved(input("  approve? [y/N] ")):
             decisions.append({"type": "approve"})
         else:
             reason = input("  reason (optional): ").strip()
             decisions.append({"type": "reject", "message": reason} if reason else {"type": "reject"})
-    
+
     return decisions
 
 

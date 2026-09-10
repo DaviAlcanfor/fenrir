@@ -10,6 +10,10 @@ from fenrir.mcp import hexstrike_tools
 from fenrir.subagents import make_subagents
 from fenrir.tools import TOOLS
 
+ROOT_INTERRUPT_ON: dict[str, bool] = {
+    "execute": True,  # the root orchestrator's local shell always pauses for approval
+}
+
 
 async def build_agent(checkpointer: BaseCheckpointSaver | None = None):
     """Build the compiled graph. Pass a checkpointer to keep per-thread state
@@ -22,6 +26,7 @@ async def build_agent(checkpointer: BaseCheckpointSaver | None = None):
         subagents=make_subagents(tools),
         skills=SKILLS,
         backend=LocalShellBackend(root_dir=str(ROOT)),
+        interrupt_on=ROOT_INTERRUPT_ON,
         checkpointer=checkpointer,
         name="fenrir",
     )
