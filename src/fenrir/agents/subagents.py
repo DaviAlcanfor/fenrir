@@ -1,30 +1,32 @@
 """Declarative specs for fenrir's four specialists, injected into the orchestrator."""
 
 from collections.abc import Sequence
-from typing import NotRequired, TypedDict
+from typing import Final, Literal, NotRequired, TypedDict
 
 from langchain_core.tools import BaseTool
 
-from fenrir.config import MODELS, SKILLS, Agent
+from fenrir.config import MODELS, SKILLS, Agent, Model
 from fenrir.settings import settings
 from fenrir.tools import TOOLS
 
 from . import prompts
 
-__all__ = ["SubAgentSpec", "make_subagents"]
+__all__ = ["SubAgentSpec", "make_subagents", "EXECUTE_TOOL_NAME"]
+
+EXECUTE_TOOL_NAME: Final = "execute"
 
 
 class SubAgentSpec(TypedDict):
-    name: str
+    name: Agent | Literal["general-purpose"]
     description: str
     system_prompt: str
-    model: str
+    model: Model
     skills: list[str]
     tools: NotRequired[Sequence[BaseTool]]
     interrupt_on: NotRequired[dict[str, bool]]
 
 
-_BELT: dict[Agent, tuple[str, ...] | None] = {
+_BELT: Final[dict[Agent, tuple[str, ...] | None]] = {
     Agent.RECON: (
         "subfinder", "amass", "dns", "httpx", "katana", "gau", "wayback",
         "gobuster", "feroxbuster", "dirsearch", "nmap", "masscan", "naabu",
@@ -38,8 +40,7 @@ _BELT: dict[Agent, tuple[str, ...] | None] = {
     Agent.EXPLOIT: None,
 }
 
-
-GENERAL_PURPOSE_REFUSAL_PROMPT = (
+GENERAL_PURPOSE_REFUSAL_PROMPT: Final = (
     "Uso nao previsto neste projeto. Recuse a tarefa delegada e explique ao "
     "operador que fenrir so opera atraves dos subagentes recon/web/exploit/triage, "
     "cada um com seu gate de aprovacao. Nao tente executar comandos ou chamar "
@@ -64,7 +65,7 @@ def _gate(agent: Agent, tools: Sequence[BaseTool]) -> dict[str, bool]:
     if not settings.approval.requires_approval(agent):
         return {}
 
-    return {t.name: True for t in tools} | {"execute": True}
+    return {t.name: True for t in tools} | {EXECUTE_TOOL_NAME: True}
 
 
 def _locked_general_purpose() -> SubAgentSpec:
@@ -79,7 +80,7 @@ def _locked_general_purpose() -> SubAgentSpec:
         model=MODELS[Agent.TRIAGE],
         skills=[],
         tools=[],
-        interrupt_on={"execute": True},
+        interrupt_on={EXECUTE_TOOL_NAME: True},
     )
 
 

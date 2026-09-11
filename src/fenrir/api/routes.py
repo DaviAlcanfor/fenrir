@@ -13,8 +13,11 @@ from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from langgraph.types import Command
 
+from fenrir.protocol import HumanTurn, InvokePayload
+
 from . import db
-from .schemas import ChatIn, ResumeIn
+from .db import ThreadRow
+from .schemas import ChatIn, HealthStatus, ResumeIn, ThreadMessages
 from .sse import as_message, stream_run
 from .state import RECURSION_LIMIT, state
 
@@ -22,42 +25,55 @@ router = APIRouter()
 
 
 @router.get("/health")
-async def health() -> dict:
-    return {"ok": state["agent"] is not None, "error": state["error"]}
+async def health() -> HealthStatus:
+    return {"ok": state.agent is not None, "error": state.error}
 
 
 @router.get("/threads")
-async def list_threads() -> list[dict]:
-    return await db.list_threads(state["db"])
+async def list_threads() -> list[ThreadRow]:
+    return await db.list_threads(state.require_db())
 
 
 @router.get("/threads/{thread_id}")
-async def get_thread(thread_id: str) -> dict:
-    agent = state["agent"]
+async def get_thread(thread_id: str) -> ThreadMessages:
+    agent = state.agent
     if agent is None:
-        raise HTTPException(503, state["error"] or "agent not ready")
+        raise HTTPException(503, state.error or "agent not ready")
+
     snap = await agent.aget_state({"configurable": {"thread_id": thread_id}})
     messages = (snap.values or {}).get("messages", []) if snap else []
-    return {"messages": [{"node": None, **as_message(m)} for m in messages]}
+
+    replayed = []
+    for m in messages:
+        out = as_message(m)
+        out["node"] = None
+        replayed.append(out)
+
+    return {"messages": replayed}
 
 
 @router.post("/chat")
 async def chat(body: ChatIn) -> StreamingResponse:
     thread_id = body.thread_id or str(uuid.uuid4())
+
     if not body.thread_id:
         title = body.message.strip().splitlines()[0][:80] or "untitled"
-        await db.record_thread(state["db"], thread_id, title, datetime.now(timezone.utc).isoformat())
-    payload = {"messages": [{"role": "user", "content": body.message}]}
+        await db.record_thread(state.require_db(), thread_id, title, datetime.now(timezone.utc).isoformat())
+
+    turn: HumanTurn = {"role": "user", "content": body.message}
+    payload: InvokePayload = {"messages": [turn]}
+
     return StreamingResponse(
-        stream_run(state["agent"], state["error"], payload, thread_id, RECURSION_LIMIT),
+        stream_run(state.agent, state.error, payload, thread_id, RECURSION_LIMIT),
         media_type="text/event-stream",
     )
 
 
 @router.post("/threads/{thread_id}/resume")
 async def resume(thread_id: str, body: ResumeIn) -> StreamingResponse:
-    payload = Command(resume={"decisions": body.decisions})
+    payload: Command = Command(resume={"decisions": body.decisions})
+
     return StreamingResponse(
-        stream_run(state["agent"], state["error"], payload, thread_id, RECURSION_LIMIT),
+        stream_run(state.agent, state.error, payload, thread_id, RECURSION_LIMIT),
         media_type="text/event-stream",
     )

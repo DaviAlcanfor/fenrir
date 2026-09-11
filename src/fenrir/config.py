@@ -3,11 +3,12 @@
 from collections.abc import Mapping
 from enum import StrEnum
 from pathlib import Path
+from typing import Final
 
-ROOT = Path(__file__).resolve().parents[2]
-PACKAGE_DIR = Path(__file__).resolve().parent
-PROMPTS_DIR = PACKAGE_DIR / "prompts"
-SKILLS = ["src/fenrir/skills"]
+ROOT: Final[Path] = Path(__file__).resolve().parents[2]
+PACKAGE_DIR: Final[Path] = Path(__file__).resolve().parent
+PROMPTS_DIR: Final[Path] = PACKAGE_DIR / "prompts"
+SKILLS: Final[list[str]] = ["src/fenrir/skills"]
 
 
 class Agent(StrEnum):
@@ -24,7 +25,7 @@ class Model(StrEnum):
     NEMOTRON_SUPER = "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 
 
-MODELS: Mapping[Agent, Model] = {
+MODELS: Final[Mapping[Agent, Model]] = {
     Agent.ORCHESTRATOR: Model.GEMINI_FLASH,
     Agent.RECON: Model.GPT_OSS_120B,
     Agent.WEB: Model.GEMINI_FLASH,

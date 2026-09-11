@@ -8,6 +8,7 @@ return [] so the agents degrade to guidance-only instead of crashing.
 import logging
 import sys
 
+from langchain_core.tools import BaseTool
 from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from fenrir.settings import settings
@@ -15,7 +16,7 @@ from fenrir.settings import settings
 log = logging.getLogger(__name__)
 
 
-async def hexstrike_tools() -> list:
+async def hexstrike_tools() -> list[BaseTool]:
     client = MultiServerMCPClient(
         {
             "hexstrike": {
@@ -25,11 +26,12 @@ async def hexstrike_tools() -> list:
             }
         }
     )
+
     try:
         tools = await client.get_tools()
-    except Exception as e:  
+    except Exception as e:
         log.warning("HexStrike bridge unavailable (%s) — running toolless.", e)
         return []
-    
+
     log.info("Loaded %d HexStrike tools.", len(tools))
     return tools

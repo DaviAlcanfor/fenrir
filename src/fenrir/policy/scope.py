@@ -7,9 +7,12 @@ any tool or guard can consult without an LLM in the loop.
 import fnmatch
 from dataclasses import dataclass, field
 from ipaddress import ip_address, ip_network
+from typing import Literal, Self
 from urllib.parse import urlsplit
 
 __all__ = ["ScopeRule", "ScopeDecision", "ScopePolicy", "host_matches"]
+
+Scheme = Literal["http", "https"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,7 +20,7 @@ class ScopeRule:
     host_pattern: str
     path_prefixes: tuple[str, ...] = ("*",)
     ports: frozenset[int] = field(default_factory=lambda: frozenset({80, 443}))
-    protocols: frozenset[str] = field(default_factory=lambda: frozenset({"http", "https"}))
+    protocols: frozenset[Scheme] = field(default_factory=lambda: frozenset({"http", "https"}))
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,7 +43,7 @@ class ScopePolicy:
         path_prefixes: tuple[str, ...] = ("*",),
         *,
         allow_private_networks: bool = False,
-    ) -> "ScopePolicy":
+    ) -> Self:
         return cls(
             allow=tuple(ScopeRule(host_pattern=h, path_prefixes=path_prefixes) for h in allow_hosts),
             deny=tuple(ScopeRule(host_pattern=h) for h in deny_hosts),

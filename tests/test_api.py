@@ -11,8 +11,10 @@ from types import SimpleNamespace
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 import aiosqlite  # noqa: E402
+from pydantic import ValidationError  # noqa: E402
 
 from fenrir.api import db  # noqa: E402
+from fenrir.api.schemas import ResumeIn  # noqa: E402
 from fenrir.api.sse import as_message, encode  # noqa: E402
 
 
@@ -42,6 +44,22 @@ def test_as_message_flattens_content_blocks():
 def test_as_message_defaults_missing_fields():
     m = SimpleNamespace()
     assert as_message(m) == {"type": "ai", "content": "", "tool_calls": []}
+
+
+def test_resume_in_accepts_approve_and_reject_decisions():
+    approve = ResumeIn.model_validate({"decisions": [{"type": "approve"}]})
+    assert approve.decisions == [{"type": "approve"}]
+
+    reject = ResumeIn.model_validate({"decisions": [{"type": "reject", "message": "no"}]})
+    assert reject.decisions == [{"type": "reject", "message": "no"}]
+
+
+def test_resume_in_rejects_an_unknown_decision_type():
+    try:
+        ResumeIn.model_validate({"decisions": [{"type": "maybe"}]})
+        raise AssertionError("expected ValidationError")
+    except ValidationError:
+        pass
 
 
 def test_db_round_trip():

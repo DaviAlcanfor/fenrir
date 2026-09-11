@@ -1,5 +1,6 @@
 """FastAPI app: agent + database lifecycle, CORS, mounted routes."""
 
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -14,16 +15,16 @@ from .state import state
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI):
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
     conn = await db.connect()
-    state["db"] = conn
+    state.db = conn
 
     try:
         async with AsyncSqliteSaver.from_conn_string(str(db.DB_PATH)) as saver:
-            state["agent"] = await build_agent(checkpointer=saver)
+            state.agent = await build_agent(checkpointer=saver)
             yield
     except Exception as e:  # noqa: BLE001 - surfaced per-request
-        state["error"] = str(e)
+        state.error = str(e)
         yield
     finally:
         await conn.close()

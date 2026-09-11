@@ -4,11 +4,15 @@ have their own approval gate). Every such tool should build its client
 through GuardedHttpClient instead of instantiating httpx/requests itself.
 """
 
+from typing import Any, Literal
+
 import httpx
 
 from fenrir.policy.scope import ScopeDecision, ScopePolicy
 
 __all__ = ["ScopeViolation", "GuardedHttpClient"]
+
+HttpMethod = Literal["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"]
 
 
 class ScopeViolation(Exception):
@@ -27,7 +31,10 @@ class GuardedHttpClient:
         self._policy = policy
         self._client = httpx.Client(timeout=timeout, follow_redirects=False)
 
-    def request(self, method: str, url: str, **kwargs: object) -> httpx.Response:
+    def request(self, method: HttpMethod, url: str, **kwargs: Any) -> httpx.Response:
+        # **kwargs forwards straight into httpx.Client.request's own richly-typed
+        # signature (headers, params, json, timeout, ...) — Any here isn't a
+        # cop-out, it's the correct type for an untouched passthrough.
         self._assert_in_scope(url)
         response = self._client.request(method, url, **kwargs)
 

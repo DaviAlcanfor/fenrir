@@ -2,18 +2,21 @@
 
 import re
 from pathlib import Path
+from typing import Final
 from urllib.parse import urlsplit
 
-from langchain_core.tools import tool
+from langchain_core.tools import BaseTool, tool
 
 from fenrir.config import ROOT
 from fenrir.policy.scope import ScopePolicy, host_matches
 
 __all__ = ["TOOLS", "in_scope", "load_scope", "load_paths", "load_policy"]
 
-SCOPE_FILE = ROOT / "scope.md"
-_TOKEN = re.compile(r"(?:\*\.)?[a-z0-9.-]+\.[a-z]{2,}|\d{1,3}(?:\.\d{1,3}){3}(?:/\d{1,2})?", re.I)
-_PATHS_LINE = re.compile(r"paths\s*:\s*(.+)", re.I)
+SCOPE_FILE: Final[Path] = ROOT / "scope.md"
+_TOKEN: Final[re.Pattern[str]] = re.compile(
+    r"(?:\*\.)?[a-z0-9.-]+\.[a-z]{2,}|\d{1,3}(?:\.\d{1,3}){3}(?:/\d{1,2})?", re.I
+)
+_PATHS_LINE: Final[re.Pattern[str]] = re.compile(r"paths\s*:\s*(.+)", re.I)
 
 _matches = host_matches  # backward-compat alias — canonical impl lives in fenrir.policy.scope
 
@@ -95,4 +98,4 @@ def in_scope(target: str) -> str:
 # ponytail: path prefixes from scope.md apply to every allowed host uniformly
 # (scope.md has no per-host path syntax today) — upgrade to per-host paths if
 # an engagement ever needs different path rules for different in-scope hosts.
-TOOLS = [in_scope]
+TOOLS: Final[list[BaseTool]] = [in_scope]
