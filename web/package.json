@@ -1,23 +1,21 @@
 {
   "name": "fenrir-web",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "node node_modules/next/dist/bin/next dev -p 3000",
-    "build": "node node_modules/next/dist/bin/next build",
-    "start": "node node_modules/next/dist/bin/next start -p 3000",
-    "lint": "node node_modules/next/dist/bin/next lint"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@gsap/react": "^2.1.2",
-    "gsap": "^3.13.0",
-    "next": "^14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "typescript": "^5"
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5",
+    "vite": "^5.4.0"
   }
 }

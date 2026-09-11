@@ -1,9 +1,5 @@
-"use client";
-
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { useEffect, useRef, useState } from "react";
-import { ApprovalPanel } from "@/components/ApprovalPanel";
+import { useEffect, useState } from "react";
+import { ApprovalPanel } from "./components/ApprovalPanel";
 import {
   getThread,
   listThreads,
@@ -13,14 +9,9 @@ import {
   type Decision,
   type InterruptRequest,
   type ThreadMeta,
-} from "@/lib/api";
+} from "./lib/api";
 
-gsap.registerPlugin(useGSAP);
-
-export default function Page() {
-  const root = useRef<HTMLDivElement>(null);
-  const log = useRef<HTMLDivElement>(null);
-
+export default function App() {
   const [threads, setThreads] = useState<ThreadMeta[]>([]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
@@ -32,26 +23,6 @@ export default function Page() {
   useEffect(() => {
     refreshThreads();
   }, []);
-
-  useGSAP(() => gsap.from(".masthead", { autoAlpha: 0, y: -16, duration: 0.5, ease: "power2.out" }), {
-    scope: root,
-  });
-
-  useGSAP(
-    () => {
-      const items = root.current?.querySelectorAll(".thread-item");
-      if (items?.length) gsap.from(items, { autoAlpha: 0, x: -10, stagger: 0.03, duration: 0.25 });
-    },
-    { scope: root, dependencies: [threads.length] },
-  );
-
-  useGSAP(
-    () => {
-      const nodes = log.current?.querySelectorAll(".msg");
-      if (nodes?.length) gsap.from(nodes[nodes.length - 1], { autoAlpha: 0, y: 12, duration: 0.3, ease: "power2.out" });
-    },
-    { scope: log, dependencies: [messages.length] },
-  );
 
   const handlers = {
     thread: setThreadId,
@@ -106,7 +77,7 @@ export default function Page() {
   };
 
   return (
-    <div className="app" ref={root}>
+    <div className="app">
       <aside className="sidebar">
         <button className="new-chat" onClick={newChat}>
           + new conversation
@@ -131,7 +102,7 @@ export default function Page() {
           <span className="sub">bug bounty assistant · human in the loop</span>
         </div>
 
-        <div className="log" ref={log}>
+        <div className="log">
           {messages.map((m, i) => (
             <div className={`msg ${m.type}`} key={i}>
               <div className="role">{m.node ?? m.type}</div>

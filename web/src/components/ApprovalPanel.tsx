@@ -1,9 +1,5 @@
-"use client";
-
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { useRef, useState } from "react";
-import type { Decision, InterruptRequest } from "@/lib/api";
+import { useState } from "react";
+import type { Decision, InterruptRequest } from "../lib/api";
 
 export function ApprovalPanel({
   request,
@@ -14,21 +10,13 @@ export function ApprovalPanel({
   disabled?: boolean;
   onResume: (decisions: Decision[]) => void;
 }) {
-  const root = useRef<HTMLDivElement>(null);
   const actions = request.action_requests ?? [];
   const [reason, setReason] = useState("");
-
-  useGSAP(
-    () => {
-      gsap.from(root.current, { autoAlpha: 0, y: 10, scale: 0.98, duration: 0.35, ease: "power2.out" });
-    },
-    { scope: root },
-  );
 
   const decideAll = (make: () => Decision) => onResume(actions.map(make));
 
   return (
-    <div className="approval" ref={root}>
+    <div className="approval">
       <strong>approval required</strong>
       {actions.map((a, i) => (
         <div className="action" key={i}>

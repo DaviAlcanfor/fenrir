@@ -1,8 +1,7 @@
 # fenrir web
 
-Minimal Next.js chat UI for fenrir. Talks to the fenrir API (`fenrir-api`) over
-server-sent events — no LangGraph SDK. Animations are GSAP via `@gsap/react`
-(`useGSAP`, so cleanup and SSR are handled).
+Minimal Vite + React chat UI for fenrir. Talks to the fenrir API (`fenrir-api`)
+over server-sent events — no LangGraph SDK, no animation library.
 
 ## Run
 
@@ -17,13 +16,19 @@ npm install
 npm run dev                       # http://localhost:3000
 ```
 
-## Files
+## Layout
 
-- `lib/api.ts` — `sendMessage()` / `resume()` (SSE), `listThreads()` / `getThread()` (JSON).
-- `app/page.tsx` — sidebar (conversation list + "new conversation"), chat log,
-  composer. GSAP entrance on the masthead, sidebar items, and each new message.
-- `components/ApprovalPanel.tsx` — approve/reject the gated tool calls fenrir
-  pauses on; posts back to `/threads/{id}/resume`.
+```text
+src/
+  main.tsx               entry point
+  App.tsx                sidebar (conversation list + "new conversation"),
+                          chat log, composer
+  index.css               styles, incl. the CSS-only entrance animations
+  lib/api.ts              sendMessage() / resume() (SSE), listThreads() / getThread() (JSON)
+  components/
+    ApprovalPanel.tsx     approve/reject the gated tool calls fenrir pauses
+                          on; posts back to /threads/{id}/resume
+```
 
 Conversations persist server-side in `fenrir.db`; the sidebar is backed by
 `GET /threads`. Not included: auth, markdown rendering, token-level streaming.
