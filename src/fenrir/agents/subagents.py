@@ -35,7 +35,7 @@ _BELT: Final[dict[Agent, tuple[str, ...] | None]] = {
     Agent.WEB: (
         "nuclei", "ffuf", "sqlmap", "dalfox", "wpscan", "nikto", "arjun",
         "paramspider", "katana", "httpx", "gobuster", "feroxbuster",
-        "dirsearch", "wafw00f", "gau", "wayback",
+        "dirsearch", "wafw00f", "gau", "wayback", "browser",
     ),
     Agent.EXPLOIT: None,
 }

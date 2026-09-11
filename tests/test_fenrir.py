@@ -21,6 +21,12 @@ def test_belt_filters_by_agent():
     assert _belt(FAKE, Agent.EXPLOIT) == FAKE  # None = whole belt
 
 
+def test_web_belt_includes_browser_agent():
+    fake = [*FAKE, SimpleNamespace(name="browser_agent_inspect")]
+    assert "browser_agent_inspect" in {t.name for t in _belt(fake, Agent.WEB)}
+    assert "browser_agent_inspect" not in {t.name for t in _belt(fake, Agent.RECON)}
+
+
 def test_gate_wraps_tools_plus_execute():
     g = _gate(Agent.WEB, FAKE)
     assert g["execute"] is True
