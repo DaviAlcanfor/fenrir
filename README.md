@@ -89,8 +89,9 @@ uv run fenrir-api               # http://localhost:8000
 | `POST /threads/{id}/resume` | `{ decisions }` | Answer a gated tool call (SSE) |
 | `GET /threads` | — | List past conversations |
 | `GET /threads/{id}` | — | Replay a conversation's messages |
+| `GET /threads/{id}/usage` | — | Token cost per agent (graph node) for that thread |
 
-Streaming responses emit `thread`, `message`, `interrupt`, `error`, and `done` events. Conversations persist in `fenrir.db` (SQLite) across restarts.
+Streaming responses emit `thread`, `message`, `interrupt`, `error`, and `done` events. Conversations and per-agent token usage persist in `fenrir.db` (SQLite) across restarts.
 
 ### Web UI
 
@@ -131,6 +132,7 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `src/fenrir/skills/` | 30 vendored `SKILL.md` playbooks |
 | `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
+| `evals/` | Behavior evals (real LLM, mocked tool belt) — `uv run python evals/runner.py`, see `evals/README.md` |
 
 [`AGENTS.md`](AGENTS.md) documents the architecture and the rules the agents operate under.
 
