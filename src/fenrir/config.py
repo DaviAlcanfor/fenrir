@@ -5,8 +5,9 @@ from enum import StrEnum
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-PROMPTS_DIR = ROOT / "src" / "prompts"
-SKILLS = ["src/skills"]  
+PACKAGE_DIR = Path(__file__).resolve().parent
+PROMPTS_DIR = PACKAGE_DIR / "prompts"
+SKILLS = ["src/fenrir/skills"]
 
 
 class Agent(StrEnum):

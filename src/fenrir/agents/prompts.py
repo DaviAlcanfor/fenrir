@@ -1,4 +1,4 @@
-"""Prompt loader. Prompts are plain Markdown in src/prompts/, one per agent."""
+"""Prompt loader. Prompts are plain Markdown in src/fenrir/prompts/, one per agent."""
 
 from fenrir.config import PROMPTS_DIR
 

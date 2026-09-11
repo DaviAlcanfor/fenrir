@@ -126,8 +126,8 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `src/fenrir/policy/` | `ScopePolicy` (host/path/port) and `GuardedHttpClient`, the egress guard |
 | `src/fenrir/agents/` | `SubAgentSpec`, `make_subagents(tools)`, `build_agent(checkpointer=None)`, prompt loader |
 | `src/fenrir/{tools,mcp,cli,server}.py` | Scope tool, HexStrike belt, REPL, API |
-| `src/prompts/` | One prompt per agent |
-| `src/skills/` | 30 vendored `SKILL.md` playbooks |
+| `src/fenrir/prompts/` | One prompt per agent |
+| `src/fenrir/skills/` | 30 vendored `SKILL.md` playbooks |
 | `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
 

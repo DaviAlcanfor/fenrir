@@ -10,7 +10,7 @@ offensively.
   subagents, skills middleware, filesystem, human-in-the-loop. We add almost no
   framework code; `create_deep_agent(...)` does the assembly.
 - **[Anthropic-Cybersecurity-Skills](https://github.com/anthropics/...)** — 30 curated
-  `SKILL.md` playbooks vendored in [src/skills/](src/skills/). These are *methodology*,
+  `SKILL.md` playbooks vendored in [src/fenrir/skills/](src/fenrir/skills/). These are *methodology*,
   not code the agent runs.
 - **[HexStrike AI](https://github.com/0x4m4/hexstrike-ai)** — 150+ security tools
   exposed over MCP (nmap, nuclei, ffuf, sqlmap, subfinder, katana, dalfox, …).
@@ -31,13 +31,13 @@ src/fenrir/
     scope.py      ScopePolicy/ScopeRule/ScopeDecision — typed host+path+port scope checks
     egress.py     GuardedHttpClient — the choke point for tools that call HTTP directly
   agents/
-    prompts.py    load(Agent.RECON) -> src/prompts/recon.md   (one-liner)
+    prompts.py    load(Agent.RECON) -> src/fenrir/prompts/recon.md   (one-liner)
     subagents.py  SubAgentSpec TypedDict + make_subagents(tools); ApprovalSettings-gated
     orchestrator.py  build_agent(checkpointer=None): model + prompt + tools + subagents + backend
   cli.py          main(): REPL with human-in-the-loop interrupts
   server.py       FastAPI (`fenrir-api`): POST /chat + POST /threads/{id}/resume (SSE)
-src/prompts/    orchestrator.md, recon.md, web.md, exploit.md, triage.md
-src/skills/     30 vendored SKILL.md playbooks (see list below)
+src/fenrir/prompts/    orchestrator.md, recon.md, web.md, exploit.md, triage.md
+src/fenrir/skills/     30 vendored SKILL.md playbooks (see list below)
 web/            Vite + React chat UI, talks to fenrir-api over SSE
 ```
 
