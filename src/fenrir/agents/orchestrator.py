@@ -4,11 +4,12 @@ from deepagents import create_deep_agent
 from deepagents.backends import LocalShellBackend
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
-from fenrir import prompts
 from fenrir.config import MODELS, ROOT, SKILLS, Agent
 from fenrir.mcp import hexstrike_tools
-from fenrir.subagents import make_subagents
 from fenrir.tools import TOOLS
+
+from . import prompts
+from .subagents import make_subagents
 
 ROOT_INTERRUPT_ON: dict[str, bool] = {
     "execute": True,  # the root orchestrator's local shell always pauses for approval

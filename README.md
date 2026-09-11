@@ -43,10 +43,10 @@ Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenri
 - **Five cooperating agents** on [deepagents](https://docs.langchain.com/oss/python/deepagents) — per-agent model, tool belt, and prompt.
 - **30 vendored [Anthropic Cybersecurity Skills](https://github.com/anthropics/anthropic-cybersecurity-skills)** as methodology: OWASP WSTG, SQLi, SSRF, IDOR, XXE, request smuggling, cache poisoning, JWT, GraphQL, and more.
 - **150+ tools from [HexStrike AI](https://github.com/0x4m4/hexstrike-ai)** over MCP — nmap, nuclei, ffuf, sqlmap, subfinder, katana, dalfox, and the rest.
-- **Scope enforcement** — an `in_scope` tool backed by `scope.md` that every agent must consult before acting on a host.
-- **Human-in-the-loop** — `execute` and every traffic-sending tool interrupt for approval; disable only via an explicit environment flag.
+- **Scope enforcement** — a typed `ScopePolicy` (host, path, and port) backed by `scope.md`; the `in_scope` tool every agent must consult before acting on a host reads from it.
+- **Human-in-the-loop** — `execute` and every traffic-sending tool interrupt for approval. Recon and web approval can be relaxed via `.env`; exploit's gate cannot be disabled by any environment variable.
 - **Free-tier models only** — Gemini, Groq, and OpenRouter `:free`.
-- **Three interfaces** — terminal REPL, streaming HTTP API, and a Next.js web UI with persisted conversation history.
+- **Three interfaces** — terminal REPL, streaming HTTP API, and a React (Vite) web UI with persisted conversation history.
 - **Graceful degradation** — if the HexStrike server is unreachable, agents fall back to guidance without the tool belt.
 
 ## Requirements
@@ -74,7 +74,7 @@ cp scope.md.example scope.md    # define what is in scope
 uv run fenrir
 ```
 
-Opens a REPL. Point it at your `scope.md`, then ask it to run recon, test a surface, or write up findings. Gated tool calls prompt `approve? [Y/n]`.
+Opens a REPL. Point it at your `scope.md`, then ask it to run recon, test a surface, or write up findings. Gated tool calls prompt `approve? [y/N]` — anything but an explicit `y`/`yes` rejects.
 
 ### HTTP API
 
@@ -101,7 +101,7 @@ cp .env.local.example .env.local
 npm install && npm run dev                     # http://localhost:3000
 ```
 
-A Next.js client for the API: conversation sidebar with history, an approval panel for gated tools, and GSAP transitions.
+A Vite + React client for the API: conversation sidebar with history and an approval panel for gated tools.
 
 ## Configuration
 
@@ -112,19 +112,23 @@ Read from `.env` at startup:
 | `GOOGLE_API_KEY` / `GROQ_API_KEY` / `OPENROUTER_API_KEY` | — | LLM provider keys |
 | `HEXSTRIKE_SERVER` | `http://localhost:8888` | HexStrike API URL |
 | `HEXSTRIKE_MCP_PATH` | `../hexstrike-ai/hexstrike_mcp.py` | MCP bridge script |
-| `REQUIRE_APPROVAL` | `true` | Set `false` to run gated tools unattended (not recommended) |
+| `APPROVAL__REQUIRE_APPROVAL_RECON` | `true` | Set `false` to run recon's gated tools unattended (not recommended) |
+| `APPROVAL__REQUIRE_APPROVAL_WEB` | `true` | Set `false` to run web's gated tools unattended (not recommended) |
+
+Exploit's approval gate has no equivalent variable — it cannot be disabled from `.env` or anywhere else.
 
 ## Project structure
 
 | Path | Contents |
 |------|----------|
 | `src/fenrir/config.py` | Paths, `Agent` / `Model` enums, and the `MODELS` routing table |
-| `src/fenrir/settings.py` | `Settings` — keys, HexStrike location, `require_approval` |
-| `src/fenrir/subagents.py` | `SubAgentSpec` and `make_subagents(tools)` |
-| `src/fenrir/{tools,mcp,agents,cli,server}.py` | Scope tool, HexStrike belt, assembly, REPL, API |
+| `src/fenrir/settings.py` | `Settings` — keys, HexStrike location, `ApprovalSettings` |
+| `src/fenrir/policy/` | `ScopePolicy` (host/path/port) and `GuardedHttpClient`, the egress guard |
+| `src/fenrir/agents/` | `SubAgentSpec`, `make_subagents(tools)`, `build_agent(checkpointer=None)`, prompt loader |
+| `src/fenrir/{tools,mcp,cli,server}.py` | Scope tool, HexStrike belt, REPL, API |
 | `src/prompts/` | One prompt per agent |
 | `src/skills/` | 30 vendored `SKILL.md` playbooks |
-| `web/` | Next.js UI, a client of `fenrir-api` |
+| `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
 
 [`AGENTS.md`](AGENTS.md) documents the architecture and the rules the agents operate under.
@@ -139,7 +143,7 @@ Read from `.env` at startup:
 | `langgraph-checkpoint-sqlite` | Conversation persistence |
 | `pydantic-settings` | Typed configuration from `.env` |
 | `fastapi` · `uvicorn` | Streaming HTTP API |
-| `next` · `react` · `gsap` | Web UI (`web/`) |
+| `vite` · `react` | Web UI (`web/`) |
 
 ## License
 

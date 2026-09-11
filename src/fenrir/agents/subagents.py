@@ -5,10 +5,11 @@ from typing import NotRequired, TypedDict
 
 from langchain_core.tools import BaseTool
 
-from fenrir import prompts
 from fenrir.config import MODELS, SKILLS, Agent
 from fenrir.settings import settings
 from fenrir.tools import TOOLS
+
+from . import prompts
 
 __all__ = ["SubAgentSpec", "make_subagents"]
 

@@ -23,18 +23,22 @@ offensively.
 
 ```
 src/fenrir/
-  config.py     paths + Agent/Model StrEnums + MODELS routing table
-  settings.py   Settings(BaseSettings): keys, HexStrike URL/path, require_approval
-  prompts.py    load(Agent.RECON) -> src/prompts/recon.md   (one-liner)
-  tools.py      custom LangChain tools (in_scope) — injected into every agent
-  mcp.py        MultiServerMCPClient -> HexStrike tools (async)
-  subagents.py  SubAgentSpec TypedDict + make_subagents(tools)
-  agents.py     build_agent(checkpointer=None): model + prompt + tools + subagents + backend
-  cli.py        main(): REPL with human-in-the-loop interrupts
-  server.py     FastAPI (`fenrir-api`): POST /chat + POST /threads/{id}/resume (SSE)
+  config.py       paths + Agent/Model StrEnums + MODELS routing table
+  settings.py     Settings(BaseSettings): keys, HexStrike URL/path, ApprovalSettings
+  tools.py        custom LangChain tools (in_scope, backed by policy/scope.py) — injected into every agent
+  mcp.py          MultiServerMCPClient -> HexStrike tools (async)
+  policy/
+    scope.py      ScopePolicy/ScopeRule/ScopeDecision — typed host+path+port scope checks
+    egress.py     GuardedHttpClient — the choke point for tools that call HTTP directly
+  agents/
+    prompts.py    load(Agent.RECON) -> src/prompts/recon.md   (one-liner)
+    subagents.py  SubAgentSpec TypedDict + make_subagents(tools); ApprovalSettings-gated
+    orchestrator.py  build_agent(checkpointer=None): model + prompt + tools + subagents + backend
+  cli.py          main(): REPL with human-in-the-loop interrupts
+  server.py       FastAPI (`fenrir-api`): POST /chat + POST /threads/{id}/resume (SSE)
 src/prompts/    orchestrator.md, recon.md, web.md, exploit.md, triage.md
 src/skills/     30 vendored SKILL.md playbooks (see list below)
-web/            Next.js chat UI (GSAP via @gsap/react), talks to fenrir-api over SSE
+web/            Vite + React chat UI, talks to fenrir-api over SSE
 ```
 
 Both `cli.py` and `server.py` build the agent with an `InMemorySaver` for

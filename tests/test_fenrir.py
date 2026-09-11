@@ -7,9 +7,9 @@ from types import SimpleNamespace
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from fenrir import prompts, subagents as sa  # noqa: E402
+from fenrir.agents import prompts, subagents as sa  # noqa: E402
+from fenrir.agents.subagents import _belt, _gate  # noqa: E402
 from fenrir.config import MODELS, Agent, Model  # noqa: E402
-from fenrir.subagents import _belt, _gate  # noqa: E402
 from fenrir.tools import _matches, in_scope, load_paths, load_scope  # noqa: E402
 
 FAKE = [SimpleNamespace(name=n) for n in ("subfinder_scan", "sqlmap_scan", "nmap_scan", "metasploit_exploit")]
