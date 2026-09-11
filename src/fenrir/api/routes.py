@@ -1,9 +1,10 @@
 """HTTP routes for the fenrir API.
 
-  POST /chat                   {message, thread_id?}  -> start / continue a run (SSE)
-  POST /threads/{id}/resume    {decisions}            -> answer a gated tool call (SSE)
-  GET  /threads                                       -> list past conversations
-  GET  /threads/{id}                                  -> replay a conversation's messages
+  POST /chat                     {message, thread_id?}  -> start / continue a run (SSE)
+  POST /threads/{id}/resume      {decisions}            -> answer a gated tool call (SSE)
+  GET  /threads                                         -> list past conversations
+  GET  /threads/{id}                                    -> replay a conversation's messages
+  GET  /threads/{id}/usage                               -> per-agent token cost for the thread
 """
 
 import uuid
@@ -12,11 +13,12 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 from langgraph.types import Command
+from starlette.background import BackgroundTask
 
 from fenrir.protocol import HumanTurn, InvokePayload
 
 from . import db
-from .db import ThreadRow
+from .db import ThreadRow, UsageRow, UsageSummary
 from .schemas import ChatIn, HealthStatus, ResumeIn, ThreadMessages
 from .sse import as_message, stream_run
 from .state import RECURSION_LIMIT, state
@@ -52,6 +54,25 @@ async def get_thread(thread_id: str) -> ThreadMessages:
     return {"messages": replayed}
 
 
+@router.get("/threads/{thread_id}/usage")
+async def get_usage(thread_id: str) -> list[UsageSummary]:
+    return await db.usage_for_thread(state.require_db(), thread_id)
+
+
+async def _persist_usage(rows: list[UsageRow]) -> None:
+    await db.record_usage(state.require_db(), rows)
+
+
+def _stream(payload: InvokePayload | Command, thread_id: str) -> StreamingResponse:
+    usage: list[UsageRow] = []
+
+    return StreamingResponse(
+        stream_run(state.agent, state.error, payload, thread_id, RECURSION_LIMIT, usage),
+        media_type="text/event-stream",
+        background=BackgroundTask(_persist_usage, usage),
+    )
+
+
 @router.post("/chat")
 async def chat(body: ChatIn) -> StreamingResponse:
     thread_id = body.thread_id or str(uuid.uuid4())
@@ -63,17 +84,11 @@ async def chat(body: ChatIn) -> StreamingResponse:
     turn: HumanTurn = {"role": "user", "content": body.message}
     payload: InvokePayload = {"messages": [turn]}
 
-    return StreamingResponse(
-        stream_run(state.agent, state.error, payload, thread_id, RECURSION_LIMIT),
-        media_type="text/event-stream",
-    )
+    return _stream(payload, thread_id)
 
 
 @router.post("/threads/{thread_id}/resume")
 async def resume(thread_id: str, body: ResumeIn) -> StreamingResponse:
     payload: Command = Command(resume={"decisions": body.decisions})
 
-    return StreamingResponse(
-        stream_run(state.agent, state.error, payload, thread_id, RECURSION_LIMIT),
-        media_type="text/event-stream",
-    )
+    return _stream(payload, thread_id)
