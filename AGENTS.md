@@ -35,14 +35,21 @@ src/fenrir/
     subagents.py  SubAgentSpec TypedDict + make_subagents(tools); ApprovalSettings-gated
     orchestrator.py  build_agent(checkpointer=None): model + prompt + tools + subagents + backend
   cli.py          main(): REPL with human-in-the-loop interrupts
-  server.py       FastAPI (`fenrir-api`): POST /chat + POST /threads/{id}/resume (SSE)
+  api/            FastAPI app (`fenrir-api`)
+    state.py      shared mutable state: built agent, build error, db connection
+    db.py         SQLite-backed conversation history (threads table)
+    schemas.py    ChatIn, ResumeIn request bodies
+    sse.py        SSE encoding + the agent-stream -> SSE generator
+    routes.py     POST /chat, POST /threads/{id}/resume, GET /threads[/{id}], GET /health
+    app.py        FastAPI() instance, CORS, lifespan (agent + db bootstrap)
 src/fenrir/prompts/    orchestrator.md, recon.md, web.md, exploit.md, triage.md
 src/fenrir/skills/     30 vendored SKILL.md playbooks (see list below)
 web/            Vite + React chat UI, talks to fenrir-api over SSE
 ```
 
-Both `cli.py` and `server.py` build the agent with an `InMemorySaver` for
-per-thread state. SSE events: `thread`, `message`, `interrupt`, `error`, `done`.
+`cli.py` builds the agent with an `InMemorySaver`; `api/app.py` uses an
+`AsyncSqliteSaver` so conversations survive restarts. SSE events: `thread`,
+`message`, `interrupt`, `error`, `done`.
 
 ## Agents
 
