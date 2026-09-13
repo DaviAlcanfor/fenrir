@@ -55,6 +55,7 @@ Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenri
 - At least one LLM API key: `GOOGLE_API_KEY`, `GROQ_API_KEY`, or `OPENROUTER_API_KEY` (each has a free tier)
 - *Optional:* Node.js 18+ for the web UI
 - *Optional:* a running [HexStrike](https://github.com/0x4m4/hexstrike-ai) server for the tool belt
+- *Optional:* [ripgrep](https://github.com/BurntSushi/ripgrep) on `PATH` — the filesystem tools fall back to a slower Python search without it, and lose automatic `.gitignore` handling (agents end up walking `.venv/`, `.git/`, etc.)
 
 ## Installation
 
@@ -109,6 +110,54 @@ npm install && npm run dev                     # http://localhost:3000
 
 A Vite + React client for the API: conversation sidebar with history and an approval panel for gated tools.
 
+### HexStrike on Windows — run it under WSL
+
+HexStrike's tool belt (nmap, subfinder, nuclei, sqlmap, ffuf, ...) is close to
+100% Linux-only tooling, and its own Python dependencies don't fare much
+better natively on Windows: `mitmproxy` pulls in a WinDivert driver that
+Windows Defender / most antivirus flags as a dual-use `RiskTool` and blocks
+the download outright (it's a legitimate but genuinely powerful
+packet-capture driver — the same category nmap/hydra/mimikatz fall into, not
+malware). If you're on Windows, run HexStrike inside **WSL2** instead of
+fighting either of those:
+
+```powershell
+wsl --install -d kali-linux        # once — installs Kali as a WSL2 distro
+```
+
+Inside that WSL distro:
+
+```bash
+python3 -m venv ~/hexstrike-env
+~/hexstrike-env/bin/pip install -r /mnt/c/path/to/hexstrike-ai/requirements.txt
+# install the CLI tools the belt actually calls — apt has most of them:
+sudo apt-get install -y nmap sqlmap gobuster ffuf nikto dnsenum masscan whatweb wafw00f amass \
+                        golang-go feroxbuster dirsearch wpscan pipx
+# ProjectDiscovery's Go tools aren't packaged — build them:
+GOBIN=/usr/local/bin go install github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
+GOBIN=/usr/local/bin go install github.com/projectdiscovery/httpx/cmd/httpx@latest
+GOBIN=/usr/local/bin go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+GOBIN=/usr/local/bin go install github.com/projectdiscovery/katana/cmd/katana@latest
+GOBIN=/usr/local/bin go install github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+GOBIN=/usr/local/bin go install github.com/hahwul/dalfox/v2@latest
+pipx install arjun
+pipx ensurepath                    # then export PATH="$PATH:/root/.local/bin" for non-login shells
+```
+
+Then start it from WSL, pointed at the Windows-side checkout via `/mnt/c/...`:
+
+```bash
+~/hexstrike-env/bin/python /mnt/c/path/to/hexstrike-ai/hexstrike_server.py
+```
+
+`fenrir-api` still runs natively on Windows and reaches it at
+`http://localhost:8888` — WSL2 forwards `localhost` both ways in the default
+configuration, no extra networking setup needed.
+
+`start-dev.ps1` (repo root) launches HexStrike (via WSL), `fenrir-api`, and
+the web UI each in their own PowerShell window in one shot — adjust the
+hexstrike-ai path in it if your checkout isn't a sibling of this repo.
+
 ## Configuration
 
 Read from `.env` at startup:
@@ -139,6 +188,7 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
 | `evals/` | Behavior evals (real LLM, mocked tool belt) — `uv run python evals/runner.py`, see `evals/README.md` |
+| `start-dev.ps1` | Launches HexStrike (WSL) + `fenrir-api` + the web UI, each in its own window |
 
 [`AGENTS.md`](AGENTS.md) documents the architecture and the rules the agents operate under.
 
