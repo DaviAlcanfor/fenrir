@@ -7,7 +7,7 @@ from deepagents.backends import LocalShellBackend
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph.state import CompiledStateGraph
 
-from fenrir.config import MODELS, ROOT, SKILLS, Agent
+from fenrir.config import ENGAGEMENT_DIR, MODELS, SKILLS, Agent
 from fenrir.mcp import hexstrike_tools
 from fenrir.tools import TOOLS
 
@@ -41,7 +41,7 @@ async def build_agent(checkpointer: BaseCheckpointSaver | None = None) -> Fenrir
         # that across two unrelated TypedDicts.
         subagents=make_subagents(tools),  # type: ignore[arg-type]
         skills=SKILLS,
-        backend=LocalShellBackend(root_dir=str(ROOT)),
+        backend=LocalShellBackend(root_dir=str(ENGAGEMENT_DIR)),
         # Same story: dict[str, bool] is deliberately narrower than deepagents'
         # dict[str, bool | InterruptOnConfig] — every gate fenrir sets is a
         # plain bool, and dict's value-type invariance is what mypy is (too

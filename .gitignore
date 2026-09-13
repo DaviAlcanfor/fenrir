@@ -1,6 +1,7 @@
 .env
 scope.md
 findings/
+engagement/skills
 __pycache__/
 *.pyc
 .venv/

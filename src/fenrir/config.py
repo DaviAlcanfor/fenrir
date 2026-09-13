@@ -8,7 +8,14 @@ from typing import Final
 ROOT: Final[Path] = Path(__file__).resolve().parents[2]
 PACKAGE_DIR: Final[Path] = Path(__file__).resolve().parent
 PROMPTS_DIR: Final[Path] = PACKAGE_DIR / "prompts"
-SKILLS: Final[list[str]] = ["src/fenrir/skills"]
+
+# The agent's filesystem root — deliberately NOT the fenrir repo itself, so
+# agents can't wander into fenrir's own source, .venv, .git, etc. Only
+# scope.md, findings/, and a `skills` junction (-> src/fenrir/skills, so the
+# vendored playbooks stay reachable under this root) live here; it's what
+# LocalShellBackend virtualizes as "/".
+ENGAGEMENT_DIR: Final[Path] = ROOT / "engagement"
+SKILLS: Final[list[str]] = ["skills"]
 
 
 class Agent(StrEnum):

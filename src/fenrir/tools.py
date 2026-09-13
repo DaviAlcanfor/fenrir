@@ -7,12 +7,12 @@ from urllib.parse import urlsplit
 
 from langchain_core.tools import BaseTool, tool
 
-from fenrir.config import ROOT
+from fenrir.config import ENGAGEMENT_DIR
 from fenrir.policy.scope import ScopePolicy, host_matches
 
 __all__ = ["TOOLS", "in_scope", "load_scope", "load_paths", "load_policy"]
 
-SCOPE_FILE: Final[Path] = ROOT / "scope.md"
+SCOPE_FILE: Final[Path] = ENGAGEMENT_DIR / "scope.md"
 _TOKEN: Final[re.Pattern[str]] = re.compile(
     r"(?:\*\.)?[a-z0-9.-]+\.[a-z]{2,}|\d{1,3}(?:\.\d{1,3}){3}(?:/\d{1,2})?", re.I
 )

@@ -137,7 +137,7 @@ def test_load_paths_defaults_to_wildcard_when_absent():
 
 
 def test_in_scope_tool_respects_path_restriction():
-    p = Path(__file__).parent.parent / "scope.md"
+    p = Path(__file__).parent.parent / "engagement" / "scope.md"
     assert not p.exists(), "a real scope.md exists — refusing to overwrite it for a test"
     p.write_text(
         "# scope\n## In scope\n- *.example.com\n- Paths: /api/*\n",

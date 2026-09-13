@@ -62,9 +62,14 @@ Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenri
 git clone https://github.com/DaviAlcanfor/fenrir.git
 cd fenrir
 uv sync
-cp .env.example .env            # add your LLM key(s)
-cp scope.md.example scope.md    # define what is in scope
+cp .env.example .env                        # add your LLM key(s)
+mkdir -p engagement
+cp scope.md.example engagement/scope.md     # define what is in scope
 ```
+
+Agents see `engagement/` as their entire filesystem (`/`) — `scope.md` and
+`findings/` live there and nowhere else. This is deliberate: it's what stops
+an agent from reading or writing fenrir's own source tree.
 
 ## Usage
 
@@ -129,7 +134,8 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `src/fenrir/{tools,mcp,cli}.py` | Scope tool, HexStrike belt, REPL |
 | `src/fenrir/api/` | FastAPI app — routes, SSE streaming, SQLite conversation history |
 | `src/fenrir/prompts/` | One prompt per agent |
-| `src/fenrir/skills/` | 30 vendored `SKILL.md` playbooks |
+| `src/fenrir/skills/` | 30 vendored `SKILL.md` playbooks — junctioned into `engagement/skills` so agents can still reach them from their isolated root |
+| `engagement/` | The agents' entire filesystem — `scope.md`, `findings/`. Gitignored; create it yourself (see Installation) |
 | `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
 | `evals/` | Behavior evals (real LLM, mocked tool belt) — `uv run python evals/runner.py`, see `evals/README.md` |

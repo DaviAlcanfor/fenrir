@@ -31,10 +31,10 @@ from langgraph.types import Command  # noqa: E402
 
 from evals.results import EvalResult, RunResult  # noqa: E402
 from fenrir.agents import build_agent  # noqa: E402
-from fenrir.config import ROOT  # noqa: E402
+from fenrir.config import ENGAGEMENT_DIR  # noqa: E402
 
 SCENARIOS_DIR = Path(__file__).resolve().parent / "scenarios"
-SCOPE_FILE = ROOT / "scope.md"
+SCOPE_FILE = ENGAGEMENT_DIR / "scope.md"
 RECURSION_LIMIT = 100
 
 
