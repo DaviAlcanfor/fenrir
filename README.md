@@ -36,7 +36,7 @@ The orchestrator never touches a target itself: it reads `scope.md`, plans the e
 | `exploit` | Minimal proof-of-concept for a single confirmed finding. Always gated. | `nemotron-super` |
 | `triage` | Deduplication, CVSS scoring, report writing. | `gpt-oss-120b` |
 
-Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenrir/config.py).
+Model routing is a single table (`MODELS`) in [`src/fenrir/config.py`](src/fenrir/config.py) — each agent gets an ordered chain of models, not just one. If the first errors (rate limits, outages), `FallbackChatModel` retries the next one automatically.
 
 ## Features
 
@@ -130,7 +130,7 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `src/fenrir/config.py` | Paths, `Agent` / `Model` enums, and the `MODELS` routing table |
 | `src/fenrir/settings.py` | `Settings` — keys, HexStrike location, `ApprovalSettings` |
 | `src/fenrir/policy/` | `ScopePolicy` (host/path/port) and `GuardedHttpClient`, the egress guard |
-| `src/fenrir/agents/` | `SubAgentSpec`, `make_subagents(tools)`, `build_agent(checkpointer=None)`, prompt loader |
+| `src/fenrir/agents/` | `SubAgentSpec`, `make_subagents(tools)`, `build_agent(checkpointer=None)`, prompt loader, `FallbackChatModel` |
 | `src/fenrir/{tools,mcp,cli}.py` | Scope tool, HexStrike belt, REPL |
 | `src/fenrir/api/` | FastAPI app — routes, SSE streaming, SQLite conversation history |
 | `src/fenrir/prompts/` | One prompt per agent |

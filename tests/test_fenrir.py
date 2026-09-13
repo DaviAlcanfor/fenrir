@@ -70,7 +70,40 @@ def test_exploit_gate_ignores_env_override():
 
 def test_models_cover_every_agent():
     assert set(MODELS) == set(Agent)
-    assert all(isinstance(m, Model) for m in MODELS.values())
+    assert all(chain and all(isinstance(m, Model) for m in chain) for chain in MODELS.values())
+
+
+def test_fallback_model_tries_next_on_error():
+    from langchain_core.language_models.chat_models import BaseChatModel
+    from langchain_core.messages import AIMessage
+    from langchain_core.outputs import ChatGeneration, ChatResult
+
+    from fenrir.agents.fallback_model import FallbackChatModel
+
+    class _Raises(BaseChatModel):
+        @property
+        def _llm_type(self):
+            return "raises"
+
+        def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+            raise RuntimeError("quota exceeded")
+
+    class _Echoes(BaseChatModel):
+        @property
+        def _llm_type(self):
+            return "echoes"
+
+        def _generate(self, messages, stop=None, run_manager=None, **kwargs):
+            return ChatResult(generations=[ChatGeneration(message=AIMessage(content="ok"))])
+
+    assert FallbackChatModel(models=[_Raises(), _Echoes()]).invoke("hi").content == "ok"
+
+    try:
+        FallbackChatModel(models=[_Raises(), _Raises()]).invoke("hi")
+    except RuntimeError:
+        pass
+    else:
+        raise AssertionError("expected every model failing to raise")
 
 
 def test_prompts_load_every_agent():

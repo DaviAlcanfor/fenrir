@@ -32,10 +32,12 @@ class Model(StrEnum):
     NEMOTRON_SUPER = "openrouter:nvidia/nemotron-3-super-120b-a12b:free"
 
 
-MODELS: Final[Mapping[Agent, Model]] = {
-    Agent.ORCHESTRATOR: Model.GEMINI_FLASH,
-    Agent.RECON: Model.GPT_OSS_120B,
-    Agent.WEB: Model.GEMINI_FLASH,
-    Agent.EXPLOIT: Model.NEMOTRON_SUPER,
-    Agent.TRIAGE: Model.GPT_OSS_120B,
+MODELS: Final[Mapping[Agent, tuple[Model, ...]]] = {
+    # First entry is the preferred model; the rest are fallbacks tried in
+    # order when it errors (rate limits, outages) — see agents/fallback_model.py.
+    Agent.ORCHESTRATOR: (Model.GEMINI_FLASH, Model.GPT_OSS_120B, Model.NEMOTRON_SUPER),
+    Agent.RECON: (Model.GPT_OSS_120B, Model.GEMINI_FLASH, Model.NEMOTRON_SUPER),
+    Agent.WEB: (Model.GEMINI_FLASH, Model.GPT_OSS_120B, Model.NEMOTRON_SUPER),
+    Agent.EXPLOIT: (Model.NEMOTRON_SUPER, Model.GPT_OSS_120B, Model.GEMINI_FLASH),
+    Agent.TRIAGE: (Model.GPT_OSS_120B, Model.GEMINI_FLASH, Model.NEMOTRON_SUPER),
 }

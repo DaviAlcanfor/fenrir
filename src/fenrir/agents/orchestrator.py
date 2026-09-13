@@ -7,11 +7,12 @@ from deepagents.backends import LocalShellBackend
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph.state import CompiledStateGraph
 
-from fenrir.config import ENGAGEMENT_DIR, MODELS, SKILLS, Agent
+from fenrir.config import ENGAGEMENT_DIR, SKILLS, Agent
 from fenrir.mcp import hexstrike_tools
 from fenrir.tools import TOOLS
 
 from . import prompts
+from .fallback_model import build_model
 from .subagents import EXECUTE_TOOL_NAME, make_subagents
 
 # Left unparameterized on purpose: deepagents/langgraph's own generic params
@@ -32,7 +33,7 @@ async def build_agent(checkpointer: BaseCheckpointSaver | None = None) -> Fenrir
     tools = await hexstrike_tools()
 
     return create_deep_agent(
-        model=MODELS[Agent.ORCHESTRATOR],
+        model=build_model(Agent.ORCHESTRATOR),
         system_prompt=prompts.load(Agent.ORCHESTRATOR),
         tools=TOOLS,
         # SubAgentSpec is a narrower, independently-declared TypedDict (not a

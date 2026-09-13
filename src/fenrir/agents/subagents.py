@@ -3,13 +3,15 @@
 from collections.abc import Sequence
 from typing import Final, Literal, NotRequired, TypedDict
 
+from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 
-from fenrir.config import MODELS, SKILLS, Agent, Model
+from fenrir.config import SKILLS, Agent
 from fenrir.settings import settings
 from fenrir.tools import TOOLS
 
 from . import prompts
+from .fallback_model import build_model
 
 __all__ = ["SubAgentSpec", "make_subagents", "EXECUTE_TOOL_NAME"]
 
@@ -20,7 +22,7 @@ class SubAgentSpec(TypedDict):
     name: Agent | Literal["general-purpose"]
     description: str
     system_prompt: str
-    model: Model
+    model: BaseChatModel
     skills: list[str]
     tools: NotRequired[Sequence[BaseTool]]
     interrupt_on: NotRequired[dict[str, bool]]
@@ -77,7 +79,7 @@ def _locked_general_purpose() -> SubAgentSpec:
         name="general-purpose",
         description="Disabled for this project — recon/web/exploit/triage cover every task.",
         system_prompt=GENERAL_PURPOSE_REFUSAL_PROMPT,
-        model=MODELS[Agent.TRIAGE],
+        model=build_model(Agent.TRIAGE),
         skills=[],
         tools=[],
         interrupt_on={EXECUTE_TOOL_NAME: True},
@@ -94,7 +96,7 @@ def make_subagents(tools: Sequence[BaseTool]) -> list[SubAgentSpec]:
             name=Agent.RECON,
             description="Subdomain/DNS/port/tech/content discovery and link-takeover checks. Scope targets go here first.",
             system_prompt=prompts.load(Agent.RECON),
-            model=MODELS[Agent.RECON],
+            model=build_model(Agent.RECON),
             skills=SKILLS,
             tools=[*TOOLS, *recon],
             interrupt_on=_gate(Agent.RECON, recon),
@@ -103,7 +105,7 @@ def make_subagents(tools: Sequence[BaseTool]) -> list[SubAgentSpec]:
             name=Agent.WEB,
             description="Hands-on web app testing of one surface using OWASP WSTG methodology.",
             system_prompt=prompts.load(Agent.WEB),
-            model=MODELS[Agent.WEB],
+            model=build_model(Agent.WEB),
             skills=SKILLS,
             tools=[*TOOLS, *web],
             interrupt_on=_gate(Agent.WEB, web),
@@ -112,7 +114,7 @@ def make_subagents(tools: Sequence[BaseTool]) -> list[SubAgentSpec]:
             name=Agent.EXPLOIT,
             description="Build a minimal proof-of-concept for ONE already-confirmed finding. Always gated.",
             system_prompt=prompts.load(Agent.EXPLOIT),
-            model=MODELS[Agent.EXPLOIT],
+            model=build_model(Agent.EXPLOIT),
             skills=SKILLS,
             tools=[*TOOLS, *exploit],
             interrupt_on=_gate(Agent.EXPLOIT, exploit),
@@ -121,7 +123,7 @@ def make_subagents(tools: Sequence[BaseTool]) -> list[SubAgentSpec]:
             name=Agent.TRIAGE,
             description="Dedupe findings, assign CVSS, write the report in the skill's output format.",
             system_prompt=prompts.load(Agent.TRIAGE),
-            model=MODELS[Agent.TRIAGE],
+            model=build_model(Agent.TRIAGE),
             skills=SKILLS,
         ),
         _locked_general_purpose(),
