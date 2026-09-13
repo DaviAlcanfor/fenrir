@@ -17,7 +17,7 @@ from fenrir.protocol import InvokePayload
 
 from .db import UsageRow
 
-SseEvent = Literal["thread", "message", "interrupt", "error", "done"]
+SseEvent = Literal["thread", "message", "interrupt", "error", "done", "agent_status"]
 
 INTERRUPT_NODE: Final = "__interrupt__"
 
@@ -85,6 +85,14 @@ async def stream_run(
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}, "recursion_limit": recursion_limit}
     yield encode("thread", {"thread_id": thread_id})
 
+    thinking: set[str] = set()
+    # Some providers (observed: Gemini) attach cumulative `usage_metadata` to
+    # every streamed chunk of a generation, not just the last one — recording
+    # one row per chunk would massively over-count. Keep only the latest chunk
+    # seen per node and flush it once, when that node's generation completes
+    # (its "updates" event arrives).
+    latest_usage: dict[str, UsageRow] = {}
+
     try:
         async for part in agent.astream(
             payload, config, stream_mode=["updates", "messages"], subgraphs=True, version="v2"
@@ -97,12 +105,22 @@ async def stream_run(
                         out = as_message(update["messages"][-1])
                         out["node"] = node
                         yield encode("message", out)
+                        if node in latest_usage:
+                            usage.append(latest_usage.pop(node))
 
             elif part["type"] == "messages":
                 chunk, meta = part["data"]
+                node = meta["langgraph_node"]
+                if node not in thinking:
+                    thinking.add(node)
+                    yield encode("agent_status", {"node": node, "status": "thinking"})
                 if isinstance(chunk, AIMessageChunk) and chunk.usage_metadata:
-                    usage.append(_usage_row(thread_id, meta["langgraph_node"], chunk))
+                    latest_usage[node] = _usage_row(thread_id, node, chunk)
     except Exception as e:  # noqa: BLE001 - report mid-stream, don't 500
         yield encode("error", {"detail": str(e)})
+
+    # Flush any node whose generation never got an "updates" event (e.g. the
+    # run errored mid-stream) so its usage isn't silently dropped.
+    usage.extend(latest_usage.values())
 
     yield encode("done", {})

@@ -15,10 +15,13 @@ export type InterruptRequest = {
 
 export type Decision = { type: "approve" } | { type: "reject"; message?: string };
 
+export type AgentStatusEvent = { node: string; status: "thinking" };
+
 type Events = {
   thread?: (id: string) => void;
   message?: (m: ChatMessage) => void;
   interrupt?: (r: InterruptRequest) => void;
+  agent_status?: (s: AgentStatusEvent) => void;
   error?: (detail: string) => void;
   done?: () => void;
 };
@@ -50,6 +53,7 @@ async function stream(path: string, body: unknown, on: Events, signal?: AbortSig
       if (event === "thread") on.thread?.(data.thread_id);
       else if (event === "message") on.message?.(data as ChatMessage);
       else if (event === "interrupt") on.interrupt?.(data as InterruptRequest);
+      else if (event === "agent_status") on.agent_status?.(data as AgentStatusEvent);
       else if (event === "error") on.error?.(data.detail);
       else if (event === "done") on.done?.();
     }

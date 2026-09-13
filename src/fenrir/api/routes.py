@@ -5,6 +5,8 @@
   GET  /threads                                         -> list past conversations
   GET  /threads/{id}                                    -> replay a conversation's messages
   GET  /threads/{id}/usage                               -> per-agent token cost for the thread
+
+SSE events on /chat and /resume: thread, agent_status ({node, status: "thinking"}), message, interrupt, error, done.
 """
 
 import uuid
