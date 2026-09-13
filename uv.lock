@@ -396,6 +396,7 @@ source = { editable = "." }
 dependencies = [
     { name = "deepagents" },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "jsonpointer" },
     { name = "langchain-google-genai" },
     { name = "langchain-groq" },
@@ -412,6 +413,7 @@ dependencies = [
 requires-dist = [
     { name = "deepagents", specifier = ">=0.7.10" },
     { name = "fastapi", specifier = ">=0.115.0" },
+    { name = "httpx", specifier = ">=0.28.0" },
     { name = "jsonpointer", specifier = ">=3.1.1" },
     { name = "langchain-google-genai", specifier = ">=2.0.0" },
     { name = "langchain-groq", specifier = ">=0.2.0" },
