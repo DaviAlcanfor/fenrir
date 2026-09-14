@@ -30,5 +30,5 @@ src/
                           on; posts back to /threads/{id}/resume
 ```
 
-Conversations persist server-side in `fenrir.db`; the sidebar is backed by
+Conversations persist server-side in `data/fenrir.db`; the sidebar is backed by
 `GET /threads`. Not included: auth, markdown rendering, token-level streaming.

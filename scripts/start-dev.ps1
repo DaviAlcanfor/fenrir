@@ -11,7 +11,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$FenrirRoot = $PSScriptRoot
+$FenrirRoot = Split-Path $PSScriptRoot -Parent
 $HexstrikeRoot = Join-Path (Split-Path $FenrirRoot -Parent) "hexstrike-ai"
 $PyScripts = Join-Path $env:APPDATA "Python\Python313\Scripts"  # uv + ripgrep live here
 

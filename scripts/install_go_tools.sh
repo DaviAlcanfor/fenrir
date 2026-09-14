@@ -1,6 +1,7 @@
 #!/bin/bash
 # ProjectDiscovery + misc Go-based recon/web tools for the HexStrike belt.
-# Run inside WSL (kali-linux): wsl -d kali-linux -u root -- bash /mnt/c/.../fenrir/install_go_tools.sh
+# Run inside WSL (kali-linux): wsl -d kali-linux -u root -- bash /mnt/c/.../fenrir/scripts/install_go_tools.sh
+# Also reused (unmodified) by docker/hexstrike.Dockerfile to build the same belt in a container.
 set -e
 export PATH=$PATH:/usr/lib/go-1.26/bin
 export GOBIN=/usr/local/bin

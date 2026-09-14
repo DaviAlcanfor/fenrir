@@ -1,0 +1,7 @@
+services:
+  hexstrike:
+    build:
+      context: ../hexstrike-ai
+      dockerfile: ../fenrir/docker/hexstrike.Dockerfile
+    ports:
+      - "8888:8888"

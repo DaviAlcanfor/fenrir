@@ -4,4 +4,4 @@
 # script's own location instead of hardcoding a username.
 export PATH="$PATH:/root/.local/bin"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-exec /root/hexstrike-env/bin/python "$SCRIPT_DIR/../hexstrike-ai/hexstrike_server.py"
+exec /root/hexstrike-env/bin/python "$SCRIPT_DIR/../../hexstrike-ai/hexstrike_server.py"

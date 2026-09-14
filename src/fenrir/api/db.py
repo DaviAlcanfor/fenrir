@@ -6,7 +6,8 @@ import aiosqlite
 
 from fenrir.config import ROOT
 
-DB_PATH: Final = ROOT / "fenrir.db"
+DB_PATH: Final = ROOT / "data" / "fenrir.db"
+DB_PATH.parent.mkdir(exist_ok=True)
 
 
 class ThreadRow(TypedDict):

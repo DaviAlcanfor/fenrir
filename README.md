@@ -97,7 +97,7 @@ uv run fenrir-api               # http://localhost:8000
 | `GET /threads/{id}` | — | Replay a conversation's messages |
 | `GET /threads/{id}/usage` | — | Token cost per agent (graph node) for that thread |
 
-Streaming responses emit `thread`, `message`, `interrupt`, `error`, and `done` events. Conversations and per-agent token usage persist in `fenrir.db` (SQLite) across restarts.
+Streaming responses emit `thread`, `message`, `interrupt`, `error`, and `done` events. Conversations and per-agent token usage persist in `data/fenrir.db` (SQLite) across restarts.
 
 ### Web UI
 
@@ -110,7 +110,7 @@ npm install && npm run dev                     # http://localhost:3000
 
 A Vite + React client for the API: conversation sidebar with history and an approval panel for gated tools.
 
-### HexStrike on Windows — run it under WSL
+### HexStrike on Windows — Docker or WSL
 
 HexStrike's tool belt (nmap, subfinder, nuclei, sqlmap, ffuf, ...) is close to
 100% Linux-only tooling, and its own Python dependencies don't fare much
@@ -118,8 +118,25 @@ better natively on Windows: `mitmproxy` pulls in a WinDivert driver that
 Windows Defender / most antivirus flags as a dual-use `RiskTool` and blocks
 the download outright (it's a legitimate but genuinely powerful
 packet-capture driver — the same category nmap/hydra/mimikatz fall into, not
-malware). If you're on Windows, run HexStrike inside **WSL2** instead of
-fighting either of those:
+malware). If you're on Windows, run HexStrike either in **Docker** (no WSL
+setup needed) or inside **WSL2**.
+
+#### Docker (recommended — no WSL needed)
+
+Requires Docker Desktop and a sibling checkout of `hexstrike-ai` (same
+assumption as the WSL/native scripts below):
+
+```powershell
+docker compose up --build -d hexstrike   # builds docker/hexstrike.Dockerfile, serves :8888
+```
+
+`scripts/start-dev-docker.ps1` does this and then launches `fenrir-api` and
+the web UI in their own windows, same as `scripts/start-dev.ps1` but without
+WSL. The image installs the same tool subset `scripts/check_tools.sh` checks
+for (not the full 150+ HexStrike supports) — see
+`docker/hexstrike.Dockerfile` to add more.
+
+#### WSL2
 
 ```powershell
 wsl --install -d kali-linux        # once — installs Kali as a WSL2 distro
@@ -154,8 +171,8 @@ Then start it from WSL, pointed at the Windows-side checkout via `/mnt/c/...`:
 `http://localhost:8888` — WSL2 forwards `localhost` both ways in the default
 configuration, no extra networking setup needed.
 
-`start-dev.ps1` (repo root) launches HexStrike (via WSL), `fenrir-api`, and
-the web UI each in their own PowerShell window in one shot — adjust the
+`scripts/start-dev.ps1` launches HexStrike (via WSL), `fenrir-api`, and the
+web UI each in their own PowerShell window in one shot — adjust the
 hexstrike-ai path in it if your checkout isn't a sibling of this repo.
 
 ## Configuration
@@ -185,10 +202,12 @@ Exploit's approval gate has no equivalent variable — it cannot be disabled fro
 | `src/fenrir/prompts/` | One prompt per agent |
 | `src/fenrir/skills/` | 30 vendored `SKILL.md` playbooks — junctioned into `engagement/skills` so agents can still reach them from their isolated root |
 | `engagement/` | The agents' entire filesystem — `scope.md`, `findings/`. Gitignored; create it yourself (see Installation) |
+| `data/` | `fenrir.db` (SQLite) — conversation history + token usage. Gitignored, created on first run |
 | `web/` | Vite + React UI, a client of `fenrir-api` |
 | `tests/` | `uv run python tests/test_fenrir.py` |
 | `evals/` | Behavior evals (real LLM, mocked tool belt) — `uv run python evals/runner.py`, see `evals/README.md` |
-| `start-dev.ps1` | Launches HexStrike (WSL) + `fenrir-api` + the web UI, each in its own window |
+| `scripts/` | Dev launchers (`start-dev.ps1` WSL, `start-dev-docker.ps1` Docker) and HexStrike/WSL setup helpers |
+| `docker/`, `docker-compose.yml` | HexStrike-in-a-container, as a WSL alternative on Windows |
 
 [`AGENTS.md`](AGENTS.md) documents the architecture and the rules the agents operate under.
 
