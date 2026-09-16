@@ -5,3 +5,14 @@ services:
       dockerfile: ../fenrir/docker/hexstrike.Dockerfile
     ports:
       - "8888:8888"
+
+  fenrir:
+    build:
+      context: .
+      dockerfile: docker/fenrir.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - HEXSTRIKE_URL=http://hexstrike:8888
+    depends_on:
+      - hexstrike
